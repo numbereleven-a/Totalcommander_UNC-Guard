@@ -1,0 +1,3 @@
+EXPORTS
+    Autorun_PluginInit
+    TCUNCGuardStop
