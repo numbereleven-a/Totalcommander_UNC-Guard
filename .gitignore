@@ -5,6 +5,7 @@
 /payload/
 /release/
 /dist/
+/artifacts/
 /package/
 installer/payload/
 *.wdx64

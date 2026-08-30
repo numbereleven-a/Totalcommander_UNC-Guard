@@ -2,7 +2,7 @@
 
 [Русская версия](README.ru.md)
 
-TCUNCGuard 0.1.1 is an experimental Windows x64 module for the external
+TCUNCGuard 0.1.2 is an experimental Windows x64 module for the external
 Autorun WDX plugin for Total Commander. Before the path bar processes Enter,
 it replaces a Cyrillic `с` when it is used as a drive letter or as the drive
 letter of an administrative UNC share.
@@ -21,10 +21,11 @@ module does not perform network requests or save entered paths.
 ## Requirements
 
 - Total Commander x64 on Windows
-- The external [Autorun WDX plugin](https://totalcmd.net/plugring/autorun.html)
+- Windows PowerShell 5.1 or later for the installer
 
-Autorun is required but is not included in this repository or its release
-archives. Install it separately before installing TCUNCGuard.
+The installer can download the external [Autorun WDX plugin](https://totalcmd.net/plugring/autorun.html)
+automatically. Autorun is not bundled in this repository or the release
+archive.
 
 ## Build
 
@@ -40,12 +41,20 @@ The resulting module has the name `TCUNCGuard.dll64`.
 
 ## Installation
 
-1. Install Autorun and close all Total Commander processes.
+1. Close all Total Commander processes.
 2. Extract the release archive.
-3. Run `installer/Install_TCUNCGuard.cmd`.
+3. Run `Install_TCUNCGuard.cmd`.
+4. Choose one of the two modes:
+   - **Full** — download/install Autorun and install TCUNCGuard.
+   - **Plugin only** — use an already installed Autorun and install TCUNCGuard.
 
-The installer copies the module to Autorun's `Plugins` directory, backs up the
-active `autorun.cfg`, and adds the following commands:
+In Full mode the installer tries the official download endpoint first, then the
+direct source and a mirror if the previous attempt fails. It verifies that the
+download contains `Autorun.wdx64` before installing it.
+
+The installer copies the module to Autorun's `Plugins` directory, registers
+Autorun in the active `Wincmd.ini`, creates the required autoload color rule,
+backs up the modified files, and adds the following commands to `autorun.cfg`:
 
 ```text
 LoadLibrary "%COMMANDER_PATH%\Plugins\wdx\Autorun\Plugins\TCUNCGuard.dll"
@@ -58,7 +67,7 @@ The `TCUNCGuardStop` command is registered after Autorun finalization and is
 used to stop the worker thread cleanly when Autorun unloads.
 
 To uninstall, close Total Commander and run
-`installer/Uninstall_TCUNCGuard.cmd`. The uninstaller removes only the
+`Uninstall_TCUNCGuard.cmd`. The uninstaller removes only the
 TCUNCGuard commands and module; the external Autorun installation is preserved.
 
 ## Limitations

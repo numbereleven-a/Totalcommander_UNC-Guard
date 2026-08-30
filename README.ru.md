@@ -2,7 +2,7 @@
 
 [English README](README.md)
 
-TCUNCGuard 0.1.1 — экспериментальный модуль Windows x64 для внешнего
+TCUNCGuard 0.1.2 — экспериментальный модуль Windows x64 для внешнего
 WDX-плагина Autorun в Total Commander. Перед обработкой Enter в строке пути он
 заменяет кириллическую `с`, если она используется как буква диска или как буква
 диска административного UNC-ресурса.
@@ -21,10 +21,10 @@ WDX-плагина Autorun в Total Commander. Перед обработкой E
 ## Требования
 
 - Total Commander x64 для Windows
-- Внешний [WDX-плагин Autorun](https://totalcmd.net/plugring/autorun.html)
+- Windows PowerShell 5.1 или новее для установщика
 
-Autorun необходим, но не входит в этот репозиторий и архивы релизов. Установите
-его отдельно до установки TCUNCGuard.
+Установщик умеет автоматически скачать внешний [WDX-плагин Autorun](https://totalcmd.net/plugring/autorun.html).
+Autorun не входит в репозиторий и архив релиза.
 
 ## Сборка
 
@@ -40,12 +40,21 @@ ctest --test-dir build -C Release --output-on-failure
 
 ## Установка
 
-1. Установите Autorun и закройте все процессы Total Commander.
+1. Закройте все процессы Total Commander.
 2. Распакуйте архив релиза.
-3. Запустите `installer/Install_TCUNCGuard.cmd`.
+3. Запустите `Install_TCUNCGuard.cmd`.
+4. Выберите один из двух режимов:
+   - **Полная установка** — скачать/установить Autorun и установить TCUNCGuard.
+   - **Только плагин** — использовать уже установленный Autorun и установить TCUNCGuard.
 
-Установщик копирует модуль в каталог `Plugins` Autorun, сохраняет резервную
-копию действующего `autorun.cfg` и добавляет такие команды:
+В режиме полной установки сначала используется официальный адрес загрузки,
+затем прямой адрес исходного файла и зеркало, если предыдущая попытка не
+удалась. Перед установкой проверяется наличие `Autorun.wdx64` в архиве.
+
+Установщик копирует модуль в каталог `Plugins` Autorun, регистрирует Autorun в
+активном `Wincmd.ini`, создаёт необходимое правило автозагрузки в цветовых
+фильтрах, сохраняет резервные копии изменяемых файлов и добавляет в
+`autorun.cfg` такие команды:
 
 ```text
 LoadLibrary "%COMMANDER_PATH%\Plugins\wdx\Autorun\Plugins\TCUNCGuard.dll"
@@ -58,7 +67,7 @@ TCUNCGuardStop
 и используется для корректной остановки рабочего потока при выгрузке.
 
 Для удаления закройте Total Commander и запустите
-`installer/Uninstall_TCUNCGuard.cmd`. Деинсталлятор удаляет только команды и
+`Uninstall_TCUNCGuard.cmd`. Деинсталлятор удаляет только команды и
 файлы TCUNCGuard; внешний Autorun сохраняется.
 
 ## Ограничения

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.2 — 2026-08-30
+
+- Added a two-mode installer for Autorun and TCUNCGuard.
+- Added automatic Autorun download with primary, direct-source, and mirror fallbacks.
+- Added Autorun registration, autoload color-rule setup, backups, and rollback handling.
+
 ## 0.1.1 — 2026-08-28
 
 - Added correction of a Cyrillic `с` typed before a drive-letter colon, such as

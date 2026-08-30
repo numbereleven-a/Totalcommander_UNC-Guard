@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(TCUNCGuard VERSION 0.1.1 LANGUAGES CXX)
+project(TCUNCGuard VERSION 0.1.2 LANGUAGES CXX)
 
 if(NOT WIN32)
     message(FATAL_ERROR "TCUNCGuard supports Windows only.")
