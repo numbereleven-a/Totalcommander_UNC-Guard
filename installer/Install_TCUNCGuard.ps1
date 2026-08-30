@@ -312,6 +312,11 @@ try {
     Copy-Item -LiteralPath $IniPath -Destination $iniBackup -ErrorAction Stop
     $autorunCfg = Join-Path $autorunTarget 'autorun.cfg'
     $cfgExisted = Test-Path -LiteralPath $autorunCfg -PathType Leaf
+    $cfgBackup = $null
+    if ($cfgExisted) {
+        $cfgBackup = "$autorunCfg.tcuncguard-transaction-$stamp.bak"
+        Copy-Item -LiteralPath $autorunCfg -Destination $cfgBackup -ErrorAction Stop
+    }
     $moduleTarget = Join-Path $autorunTarget 'Plugins\TCUNCGuard.dll64'
     $moduleExisted = Test-Path -LiteralPath $moduleTarget -PathType Leaf
 
@@ -328,6 +333,9 @@ try {
     }
     if ($autorunCfg -and -not $cfgExisted -and (Test-Path -LiteralPath $autorunCfg)) {
         Remove-Item -LiteralPath $autorunCfg -Force -ErrorAction SilentlyContinue
+    }
+    if ($cfgBackup -and (Test-Path -LiteralPath $cfgBackup)) {
+        Copy-Item -LiteralPath $cfgBackup -Destination $autorunCfg -Force -ErrorAction SilentlyContinue
     }
     if ($moduleTarget -and -not $moduleExisted -and (Test-Path -LiteralPath $moduleTarget)) {
         Remove-Item -LiteralPath $moduleTarget -Force -ErrorAction SilentlyContinue

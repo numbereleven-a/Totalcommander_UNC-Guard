@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.3 — 2026-08-30
+
+- Completed installer rollback for `autorun.cfg` when a later installation step fails.
+
 ## 0.1.2 — 2026-08-30
 
 - Added a two-mode installer for Autorun and TCUNCGuard.

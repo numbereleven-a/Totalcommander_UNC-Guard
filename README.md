@@ -2,7 +2,7 @@
 
 [Русская версия](README.ru.md)
 
-TCUNCGuard 0.1.2 is an experimental Windows x64 module for the external
+TCUNCGuard 0.1.3 is an experimental Windows x64 module for the external
 Autorun WDX plugin for Total Commander. Before the path bar processes Enter,
 it replaces a Cyrillic `с` when it is used as a drive letter or as the drive
 letter of an administrative UNC share.
