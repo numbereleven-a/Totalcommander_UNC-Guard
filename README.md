@@ -2,7 +2,7 @@
 
 [Русская версия](README.ru.md)
 
-TCUNCGuard 0.1.3 is an experimental Windows x64 module for the external
+TCUNCGuard 0.2 is an experimental Windows x64 module for the external
 Autorun WDX plugin for Total Commander. Before the path bar processes Enter,
 it replaces a Cyrillic `с` when it is used as a drive letter or as the drive
 letter of an administrative UNC share.
@@ -48,13 +48,29 @@ The resulting module has the name `TCUNCGuard.dll64`.
    - **Full** — download/install Autorun and install TCUNCGuard.
    - **Plugin only** — use an already installed Autorun and install TCUNCGuard.
 
+The installer checks the registry, Windows application paths, and `totalcmd`
+folders in the root of every file-system drive. If Total Commander still cannot
+be detected, enter either its folder or the full path to `TOTALCMD64.EXE`.
+When `Wincmd.ini` exists beside `TOTALCMD64.EXE`, that portable/shared
+configuration takes precedence over a profile copy in `%APPDATA%`.
+
+On a multi-user computer, run the installer once under each Windows account.
+The Autorun files may be shared, but each account has its own `Wincmd.ini`.
+The installer resolves that account's active configuration before requesting
+administrator privileges. On failure it reports the exact stage, reason,
+account, Total Commander path, and `Wincmd.ini` path that were detected.
+Redirected Windows profiles and `Wincmd.ini` files on UNC network shares are
+supported; PowerShell provider-qualified paths are converted to native paths
+before the Total Commander configuration is updated.
+
 In Full mode the installer tries the official download endpoint first, then the
 direct source and a mirror if the previous attempt fails. It verifies that the
 download contains `Autorun.wdx64` before installing it.
 
 The installer copies the module to Autorun's `Plugins` directory, registers
-Autorun in the active `Wincmd.ini`, creates the required autoload color rule,
-backs up the modified files, and adds the following commands to `autorun.cfg`:
+Autorun in the active `Wincmd.ini`, creates the required saved plugin search
+and autoload color rule, backs up the modified files, and adds the following
+commands to `autorun.cfg`:
 
 ```text
 LoadLibrary "%COMMANDER_PATH%\Plugins\wdx\Autorun\Plugins\TCUNCGuard.dll"

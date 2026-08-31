@@ -14,6 +14,33 @@ function Test-Administrator {
     return $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 }
 
+function Resolve-TotalCommanderDirectory([string]$Candidate) {
+    if ([string]::IsNullOrWhiteSpace($Candidate)) { return $null }
+
+    $candidate = $Candidate.Trim().Trim('"')
+    if ([string]::IsNullOrWhiteSpace($candidate)) { return $null }
+
+    try {
+        $item = Get-Item -LiteralPath $candidate -ErrorAction Stop
+        if ($item.PSIsContainer) {
+            $directory = $item.FullName
+        } elseif ($item.Name -ieq 'TOTALCMD64.EXE') {
+            $directory = $item.DirectoryName
+        } else {
+            return $null
+        }
+
+        $executable = Join-Path -Path $directory -ChildPath 'TOTALCMD64.EXE'
+        if (Test-Path -LiteralPath $executable -PathType Leaf) {
+            return (Resolve-Path -LiteralPath $directory).Path
+        }
+    } catch {
+        # Registry values can contain command-line arguments or other invalid data.
+        # Ignore those entries and let the caller request a path from the user.
+    }
+    return $null
+}
+
 function Find-TotalCommander {
     $candidates = [Collections.Generic.List[string]]::new()
     foreach ($registryPath in @(
@@ -22,14 +49,17 @@ function Find-TotalCommander {
         'HKLM:\Software\WOW6432Node\Ghisler\Total Commander'
     )) {
         $item = Get-ItemProperty -LiteralPath $registryPath -ErrorAction SilentlyContinue
-        if ($item.InstallDir) { $candidates.Add([Environment]::ExpandEnvironmentVariables($item.InstallDir)) }
+        if ($item.InstallDir) {
+            foreach ($installDir in @($item.InstallDir)) {
+                $candidates.Add([Environment]::ExpandEnvironmentVariables([string]$installDir))
+            }
+        }
     }
     $candidates.Add('C:\Program Files\totalcmd')
     $candidates.Add('C:\totalcmd')
     foreach ($candidate in $candidates) {
-        if ($candidate -and (Test-Path -LiteralPath (Join-Path $candidate 'TOTALCMD64.EXE'))) {
-            return (Resolve-Path -LiteralPath $candidate).Path
-        }
+        $directory = Resolve-TotalCommanderDirectory $candidate
+        if ($directory) { return $directory }
     }
     return $null
 }
@@ -72,11 +102,17 @@ function Write-TextFilePreservingEncoding([string]$Path, [string]$Text,
 }
 
 if (-not $TotalCommanderPath) { $TotalCommanderPath = Find-TotalCommander }
-if (-not $TotalCommanderPath -or -not (Test-Path -LiteralPath (Join-Path $TotalCommanderPath 'TOTALCMD64.EXE'))) {
+$TotalCommanderPath = Resolve-TotalCommanderDirectory $TotalCommanderPath
+if (-not $TotalCommanderPath) {
     if ($Quiet) { throw 'TOTALCMD64.EXE was not found.' }
-    $TotalCommanderPath = Read-Host 'Enter the folder containing TOTALCMD64.EXE'
+    do {
+        $manualPath = Read-Host 'Enter the Total Commander folder or the full path to TOTALCMD64.EXE'
+        $TotalCommanderPath = Resolve-TotalCommanderDirectory $manualPath
+        if (-not $TotalCommanderPath) {
+            Write-Warning 'The path must point to a folder containing TOTALCMD64.EXE or to TOTALCMD64.EXE itself.'
+        }
+    } while (-not $TotalCommanderPath)
 }
-$TotalCommanderPath = (Resolve-Path -LiteralPath $TotalCommanderPath).Path
 
 if (Get-Process -Name TOTALCMD64 -ErrorAction SilentlyContinue) {
     throw 'Close Total Commander and run the uninstaller again.'
